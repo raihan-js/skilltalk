@@ -94,6 +94,17 @@ function startListening() {
       }
       $("transcript").value = (finalText + interim).trim();
     };
+    recognition.onerror = (e) => {
+      $("mic").classList.remove("recording");
+      const messages = {
+        "not-allowed": "Microphone blocked — allow mic access for this site in your browser's address-bar icon, then try again.",
+        "service-not-allowed": "Microphone blocked — allow mic access for this site in your browser's address-bar icon, then try again.",
+        "no-speech": "Didn't catch any speech — hold the button while you talk, then release.",
+        "network": "Chrome couldn't reach its speech recognition service — it needs an internet connection even for local use. Type your answer instead.",
+        "audio-capture": "No microphone found. Check your mic is connected, or type your answer.",
+      };
+      status(messages[e.error] || `Speech recognition error: ${e.error}. Type your answer instead.`);
+    };
     recognition.start();
     status("Listening… release to stop.");
     return;
