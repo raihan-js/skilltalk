@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "_about": "Checks run by .claude/hooks/stop_gate.py before the agent finishes. A check only runs once the project has it (script/file/command exists).",
+  "checks": [
+    {
+      "name": "Lint",
+      "cmd": "npm run lint --silent",
+      "when_script": "lint"
+    },
+    {
+      "name": "Typecheck",
+      "cmd": "npm run typecheck --silent",
+      "when_script": "typecheck"
+    },
+    {
+      "name": "Unit tests",
+      "cmd": "npm test --silent",
+      "when_script": "test",
+      "timeout": 300
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+# Engineering topics for the generated engineering-playbook.md
+# Each topic: plain explanation + an everyday analogy + what it means per scale tier.
+#   tiers: starter (small, <100 users, hobby/annoying), growth (100–10k or business-critical small),
+#          scale (10k+ or business-critical growth)
+#   status: now | later | skip     (skip = "not needed for this project — and why")
+#   when:   optional condition: website | backend | public | ai | payments
+# Contributors: keep explanations short, concrete and jargon-free. This file teaches non-engineers.
+
+topics:
+  - id: git
+    title: Git & version control
+    analogy: "Unlimited undo + a diary of every change, for the whole project."
+    plain: >-
+      Git saves a snapshot ("commit") every time a piece of work is finished. If anything breaks, you can go back to
+      the last snapshot that worked. Small, frequent commits with clear messages are the cheapest insurance there is.
+    tiers:
+      starter: {status: now, note: "Commit after every small working step. Never leave work uncommitted overnight."}
+      growth: {status: now, note: "Same, plus meaningful commit messages the owner can read."}
+      scale: {status: now, note: "Same, plus tags for every release so you can roll back precisely."}
+
+  - id: github_flow
+    title: GitHub, branches & pull requests
+    analogy: "Drafts on the side; the final copy only changes after a check."
+    plain: >-
+      "main" is the version real users get. New work happens on a branch (a side copy). When it's ready, a pull request
+      (PR) asks to merge it into main. The PR shows exactly what changed and runs the automatic checks first.
+      This is what stops half-finished or broken code from reaching users.
+    tiers:
+      starter: {status: now, note: "One branch per feature or bug. The AI opens a PR; you (or the reviewer agent) approve it."}
+      growth: {status: now, note: "Same, plus branch protection: main can't be changed without green CI."}
+      scale: {status: now, note: "Same, plus required human review for risky areas (payments, auth, data)."}
+
+  - id: ci
+    title: CI — continuous integration
+    analogy: "A robot inspector that checks every change before it's allowed in."
+    plain: >-
+      Every pull request automatically runs lint (style & common mistakes), typecheck (wrong kinds of data), tests
+      (does it still do what it should?) and a build (can it be deployed?), plus a scan for leaked passwords.
+      A red ❌ means "don't merge yet". Already set up in .github/workflows/ci.yml.
+    tiers:
+      starter: {status: now, note: "Keep CI green. Never disable a check to make it pass."}
+      growth: {status: now, note: "Add end-to-end tests of the main user journeys."}
+      scale: {status: now, note: "Add performance budgets and database-migration checks."}
+
+  - id: cd
+    title: CD — continuous deployment & previews
+    analogy: "Merging the PR is pressing 'publish'."
+    plain: >-
+      Your host (e.g. Vercel, Railway, Render) watches GitHub. Each pull request gets its own preview link you can click
+      and test. When a PR merges into main, the host deploys it to production automatically. No manual uploading,
+      no "works on my machine".
+    tiers:
+      starter: {status: now, note: "Connect the repo to the host once; test every PR on its preview link."}
+      growth: {status: now, note: "Same, plus a staging environment with its own database for risky changes."}
+      scale: {status: now, note: "Gradual rollouts (a few % of users first) and one-click rollback."}
+
+  - id: environments
+    title: Environments — local, preview, production
+    analogy: "Rehearsal room, dress rehearsal, live show."
+    plain: >-
+      Local = your computer. Preview/staging = a private copy online for testing. Production = what real users see.
+      Each has its own settings and ideally its own database, so testing never damages real data.
+    tiers:
+      starter: {status: now, note: "Local + PR previews + production. Use a separate dev database if the host allows it for free."}
+      growth: {status: now, note: "Separate databases for dev/preview and production — never test on real user data."}
+      scale: {status: now, note: "Full staging that mirrors production; infrastructure described in code."}
+
+  - id: secrets
+    title: Secrets & API keys
+    analogy: "House keys: never taped to the front door."
+    plain: >-
+      Passwords and API keys live in a .env file on your computer and in the host's "environment variables" settings —
+      never in code or GitHub. Anything with a "public" prefix (like NEXT_PUBLIC_) ends up in the browser, so it must
+      never be secret. Hooks, git hooks and CI all check for leaks.
+    tiers:
+      starter: {status: now, note: "Rule is absolute from day one. If a key ever leaks: revoke it immediately, then create a new one."}
+      growth: {status: now, note: "Different keys per environment; rotate keys when someone leaves."}
+      scale: {status: now, note: "Use a secrets manager and least-privilege keys per service."}
+
+  - id: testing
+    title: Automated tests
+    analogy: "A checklist a robot runs in seconds, every single time."
+    plain: >-
+      Unit tests check small pieces; end-to-end tests click through the app like a user. Tests are what stop the
+      "fix one thing, break another" loop. Rule: every bug fix comes with a test that would have caught it.
+    tiers:
+      starter: {status: now, note: "Unit tests for core logic + 1 end-to-end test of the main journey."}
+      growth: {status: now, note: "End-to-end test for every must-have feature; permission tests (user A can't see B's data)."}
+      scale: {status: now, note: "Load tests before big launches; contract tests between services."}
+
+  - id: migrations
+    title: Database changes (migrations)
+    when: backend
+    analogy: "Renovation plans, not knocking walls down at random."
+    plain: >-
+      When the shape of your data changes (a new column, a new table), it's done with a migration: a small script
+      saved in git that changes the database step by step, the same way on every environment. Never edit the
+      production database by hand.
+    tiers:
+      starter: {status: now, note: "All schema changes as migration files in git."}
+      growth: {status: now, note: "Migrations run automatically on deploy; never delete columns in the same release that stops using them."}
+      scale: {status: now, note: "Zero-downtime migration patterns (expand → migrate → contract)."}
+
+  - id: backups
+    title: Backups & recovery
+    when: backend
+    analogy: "A spare key kept at a friend's house — and checking it actually opens the door."
+    plain: >-
+      A backup is a copy of your data from which you can restore after a mistake or outage. A backup you've never
+      restored is only a hope: test restoring once.
+    tiers:
+      starter: {status: now, note: "Confirm the database host's automatic backups are ON; export data before risky changes."}
+      growth: {status: now, note: "Daily backups kept 7+ days; do a test restore every few months."}
+      scale: {status: now, note: "Point-in-time recovery; documented restore steps; backups in a second region."}
+
+  - id: monitoring
+    title: Monitoring, error tracking & alerts
+    analogy: "Smoke detectors: you find out before your users tell you."
+    plain: >-
+      Error tracking (e.g. Sentry, free tier) records every crash with details. Uptime checks ping your site every
+      minute and message you if it's down. Logs are the app's diary for investigating problems.
+    tiers:
+      starter: {status: later, note: "Host logs are enough to start. Add free error tracking before sharing widely."}
+      growth: {status: now, note: "Error tracking + an uptime check with email/phone alerts."}
+      scale: {status: now, note: "Dashboards (speed, errors, usage), alert rules, and someone on call."}
+
+  - id: security
+    title: Security basics
+    analogy: "Locks on every door, not just the front one."
+    plain: >-
+      The server must check who is asking on every request (the browser can be faked). Validate all input on the
+      server. With Supabase, Row Level Security must be ON for every table. Keep dependencies updated
+      (Dependabot opens PRs for you).
+    tiers:
+      starter: {status: now, note: "Auth checks on the server, RLS on, input validation, dependency updates."}
+      growth: {status: now, note: "Rate limiting on logins and APIs; security review before every release."}
+      scale: {status: now, note: "Regular audits, a vulnerability disclosure contact, security headers everywhere."}
+
+  - id: rate_limits
+    title: Rate limiting & abuse protection
+    when: public
+    analogy: "A bouncer: nobody gets 1,000 drinks a minute."
+    plain: >-
+      Limits how often one person (or bot) can call something: logins, sign-ups, AI features. Stops attacks and
+      surprise bills.
+    tiers:
+      starter: {status: now, note: "Limit sign-up/login attempts and any AI or email-sending endpoint."}
+      growth: {status: now, note: "Per-user limits on all write APIs; bot protection (e.g. Turnstile) on sign-up."}
+      scale: {status: now, note: "Edge/CDN-level protection (WAF) and abuse monitoring."}
+
+  - id: performance
+    title: Speed — caching & CDN
+    when: website
+    analogy: "Keeping popular items on the shelf by the door instead of in the basement."
+    plain: >-
+      A CDN stores copies of your site on servers around the world so pages load fast everywhere. Caching remembers
+      answers so the database isn't asked the same question 1,000 times.
+    tiers:
+      starter: {status: skip, note: "Your host already uses a CDN. Just keep images small and pages simple."}
+      growth: {status: later, note: "Cache slow or popular data when you measure a slow page — not before."}
+      scale: {status: now, note: "Caching layer (e.g. Redis), image optimization, database indexes reviewed."}
+
+  - id: vertical_scaling
+    title: Vertical scaling (a bigger machine)
+    analogy: "Swapping your car for a bigger truck."
+    plain: >-
+      Giving a server or database more CPU and memory. Simple — usually a slider in the host's dashboard — but it
+      has a ceiling and costs more. Almost always the right FIRST move when things get slow.
+    tiers:
+      starter: {status: skip, note: "Free tiers are enough at this size."}
+      growth: {status: now, note: "When the database gets slow: add indexes first, then upgrade the database plan."}
+      scale: {status: now, note: "Size the database for peak traffic; upgrade before launches, not during."}
+
+  - id: horizontal_scaling
+    title: Horizontal scaling (more machines) & load balancing
+    analogy: "Opening more checkout lanes instead of making one cashier faster."
+    plain: >-
+      Running several copies of your server with a load balancer spreading visitors between them. It only works if
+      the server is "stateless": nothing important stored in its memory or local disk — sessions, files and data live
+      in the database or file storage. Serverless hosts (like Vercel) do this for you automatically.
+    tiers:
+      starter: {status: skip, note: "Not needed. But write stateless code from day one (no files saved on the server)."}
+      growth: {status: later, note: "Your host scales server copies for you; keep the code stateless and uploads in object storage."}
+      scale: {status: now, note: "Autoscaling on real metrics, database connection pooling, read replicas for heavy reads."}
+
+  - id: background_jobs
+    title: Background jobs & queues
+    analogy: "Taking a ticket at the deli instead of blocking the counter."
+    plain: >-
+      Slow work (sending emails, long AI calls, generating reports) is put in a queue and done in the background, so
+      the user isn't stuck waiting and failures can be retried.
+    tiers:
+      starter: {status: skip, note: "Do things directly and keep them fast. For scheduled tasks (like reminder emails) use the host's built-in cron, not a queue system."}
+      growth: {status: later, note: "Use a managed queue/cron when an action takes >10 seconds or must retry (e.g. emails)."}
+      scale: {status: now, note: "Queue all slow or external work; dead-letter queue + alerts for failed jobs."}
+
+  - id: containers
+    title: Containers (Docker)
+    analogy: "A shipping container: the app plus everything it needs, packed identically everywhere."
+    plain: >-
+      Docker packs your app with its exact environment so it runs the same on any computer or cloud. Useful for custom
+      servers; unnecessary on platforms like Vercel.
+    tiers:
+      starter: {status: skip, note: "Managed hosting runs your code without containers."}
+      growth: {status: later, note: "Only if you run a custom server that the host needs as a Docker image."}
+      scale: {status: now, note: "Every service shipped as a container image built by CI."}
+
+  - id: kubernetes
+    title: Kubernetes
+    analogy: "An automated port that manages thousands of shipping containers — powerful, and a full-time job."
+    plain: >-
+      Kubernetes runs many containers across many machines, restarts crashed ones and scales them. It's the right tool
+      for big systems with many services and a dedicated operations team. For almost every new product it's
+      expensive over-engineering — the AI should NOT add it unless this playbook says NOW.
+    tiers:
+      starter: {status: skip, note: "Definitely not. Managed hosting does everything you need."}
+      growth: {status: skip, note: "Still not. Use managed platforms (Vercel, Railway, Render, Cloud Run, Fly.io)."}
+      scale: {status: later, note: "Only when you have several services AND someone to operate it — and prefer a managed version (GKE Autopilot, EKS, AKS)."}
+
+  - id: cost_control
+    title: Cost control
+    analogy: "A spending limit on the credit card."
+    plain: >-
+      Cloud and AI services bill by usage, and bugs (like an infinite loop calling an AI API) can create surprise
+      bills. Set budget alerts and hard limits wherever the provider allows it.
+    tiers:
+      starter: {status: now, note: "Budget alerts on every paid service; the AI asks before adding anything paid."}
+      growth: {status: now, note: "Monthly cost review in /status; per-user limits on expensive features."}
+      scale: {status: now, note: "Cost per user tracked; reserved/committed pricing for steady workloads."}
+
+  - id: incidents
+    title: When production breaks (rollback)
+    analogy: "Fire drill: everyone knows the exits before there's smoke."
+    plain: >-
+      First restore service, then investigate. Most hosts can redeploy the previous version in one click; otherwise
+      revert the pull request. Then find the root cause and add a test so it can't happen again.
+    tiers:
+      starter: {status: now, note: "Know where the host's 'redeploy previous version' button is."}
+      growth: {status: now, note: "Written rollback steps; a status message for users during outages."}
+      scale: {status: now, note: "Incident process: who's on call, how to communicate, blameless post-mortems."}
+
+  - id: accessibility_seo
+    title: Accessibility & SEO
+    when: website
+    analogy: "Ramps and signposts: everyone can get in, and people can find the building."
+    plain: >-
+      Accessibility means the site works with keyboards, screen readers and for people with low vision (labels,
+      contrast, alt text). SEO means search engines understand your pages (titles, descriptions, fast load).
+    tiers:
+      starter: {status: now, note: "Real labels on buttons/inputs, readable contrast, page titles."}
+      growth: {status: now, note: "Automated accessibility checks in CI; sitemap and meta tags for public pages."}
+      scale: {status: now, note: "Accessibility audit; structured data; performance budgets per page."}

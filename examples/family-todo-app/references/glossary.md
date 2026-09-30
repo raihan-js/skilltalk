@@ -1,0 +1,31 @@
+# Glossary (plain language)
+
+- **frontend** — The part of the app people see and click.
+- **backend** — Code running on a server behind the scenes: saves data, checks logins, talks to AI.
+- **database** — Where the app permanently saves information.
+- **API** — A way for one program to ask another program to do something.
+- **deploy** — Putting your app on the internet so others can use it.
+- **environment variables (.env)** — A private settings file for secrets like API keys. Never shared publicly.
+- **MVP** — Minimum viable product — the smallest version that is genuinely useful.
+- **free tier** — The free plan of a paid service, with usage limits.
+- **repository (repo)** — The project folder, tracked with git so every change can be undone.
+- **commit** — A saved snapshot of the project with a short note about what changed.
+- **branch** — A side copy of the project where new work happens without touching the live version.
+- **pull request (PR)** — A request to merge a branch into main, showing every change and running the checks first.
+- **CI (continuous integration)** — Robot checks (lint, types, tests, build) that run automatically on every PR.
+- **CD (continuous deployment)** — Automatic publishing: merging into main deploys the new version.
+- **lint** — An automatic check for style problems and common mistakes in code.
+- **typecheck** — An automatic check that data of the right kind is used everywhere (e.g. a number, not text).
+- **hook** — A small script that runs automatically at a certain moment (before a command, after an edit…).
+- **subagent** — A specialised AI helper with one job, e.g. reviewing code or hunting a bug.
+- **migration** — A saved, repeatable script that changes the structure of the database.
+- **vertical scaling** — Making one machine bigger (more CPU/memory).
+- **horizontal scaling** — Adding more machines that share the work.
+- **Kubernetes** — A system for running many containers across many machines. Powerful, complex, rarely needed early.
+- **rollback** — Going back to the previous working version after a bad release.
+- **Website** — works in any browser, on phone and computer; fastest to build.
+- **Next.js** — most popular React toolkit; AI agents know it very well.
+- **Use a ready-made backend** — Supabase or Firebase give database + logins with little code.
+- **Supabase (Postgres)** — online database with logins built in; free to start.
+- **Google login** — one click with their Google account.
+- **Vercel** — one-click hosting for websites; free for small projects.

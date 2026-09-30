@@ -1,0 +1,32 @@
+# Launch checklist — {{ title }}
+
+Go through this with the AI (`/ship` covers the per-change part). Tick everything before telling the world.
+
+## Works
+- [ ] Every must-have feature works on the live site{% if s.platform == "Website" %}, on phone and desktop{% endif %}
+- [ ] The main user journey has an end-to-end test that runs in CI
+- [ ] Error messages are friendly, in plain words; nothing shows a blank screen or raw error
+- [ ] A fresh user can sign up / start without help (ask someone who's never seen it)
+
+## Safe
+- [ ] `security-auditor` agent run: no 🔴 or 🟠 left
+- [ ] No secrets in the repo (CI secret scan green); production keys only in the host's settings
+{% if "Supabase" in (s.database or "") %}- [ ] Row Level Security ON for every Supabase table, with tests for "user A can't see user B's data"
+{% endif %}{% if s.auth %}- [ ] Login, logout and account recovery tested; sign-up/login rate-limited
+{% endif %}{% if s.uses_ai == "Yes" %}- [ ] AI key only on the server; per-user usage limit; spending cap set at the AI provider
+{% endif %}{% if s.monetization and s.monetization != "Free" %}- [ ] Payments tested in test mode end to end (success, failure, cancel, refund); webhook signatures verified
+- [ ] Switched to live keys only after all of the above
+{% endif %}{% if s.sensitive_data in ["Yes", "Not sure"] %}- [ ] Sensitive data: minimum collected, encrypted where possible, access logged; check legal rules (e.g. GDPR) for your users' countries
+{% endif %}
+## Recoverable
+{% if "No backend" not in (s.backend or "") %}- [ ] Database backups ON and one test restore done
+{% endif %}- [ ] You know how to roll back (host's "redeploy previous version" or revert the PR)
+- [ ] Budget alerts set on every paid service ({{ budget }}/month)
+{% if tier.id != "starter" %}- [ ] Error tracking + uptime alerts go to your phone/email
+{% endif %}
+## Findable & fair
+{% if s.target_users == "The public" %}- [ ] Privacy policy and terms pages (required once you collect personal data)
+- [ ] Contact / support email visible
+{% endif %}{% if s.platform == "Website" %}- [ ] Page titles and descriptions set; custom domain connected with HTTPS
+- [ ] Basic accessibility: labels, contrast, keyboard navigation
+{% endif %}- [ ] README explains in plain words how to run, deploy and where each secret goes

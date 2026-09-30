@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkillTalk</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>SkillTalk <span aria-hidden="true">🎙️→📄</span></h1>
+    <p class="tag">Talk about your app idea. Get instructions your AI coding agent can follow.</p>
+    <label class="toggle"><input type="checkbox" id="speak" checked /> Read questions aloud</label>
+  </header>
+
+  <main>
+    <section id="start-card" class="card center">
+      <p>No typing needed. Press start, then hold the mic button (or press space) while you talk.</p>
+      <button id="start" class="primary big">Start</button>
+    </section>
+
+    <section id="chat" class="card hidden" aria-live="polite">
+      <div class="progress"><div id="bar"></div></div>
+      <p id="topic" class="topic"></p>
+      <p id="question" class="question"></p>
+      <p id="why" class="why"></p>
+      <div id="options" class="options"></div>
+
+      <div class="answer">
+        <textarea id="transcript" rows="3" placeholder="Your answer appears here — fix anything that was misheard, then Send."></textarea>
+        <div class="row">
+          <button id="mic" class="mic" aria-label="Hold to talk">🎤 Hold to talk</button>
+          <button id="send" class="primary">Send</button>
+        </div>
+        <p id="status" class="status"></p>
+      </div>
+    </section>
+
+    <section id="result" class="card hidden">
+      <h2>Your skill is ready 🎉</h2>
+      <div class="row">
+        <a id="download" class="primary button" href="#">Download skill (.zip)</a>
+      </div>
+      <details open>
+        <summary>How to install it</summary>
+        <ol>
+          <li><b>Claude Code:</b> unzip into <code>your-project/.claude/skills/</code> (or <code>~/.claude/skills/</code>
+            for all projects). Or run <code>skilltalk install &lt;folder&gt; --target project</code>.</li>
+          <li><b>Other agents</b> (Codex, Cursor, Gemini CLI…): run
+            <code>skilltalk install &lt;folder&gt; --target agents --project-dir your-project</code>
+            (or <code>python3 &lt;folder&gt;/setup/bootstrap.py your-project</code>).</li>
+          <li>Then tell your agent: <i>"Use the skill and start Milestone 0."</i> It sets up the safety net
+            (hooks, checks, GitHub, automatic deploys) by itself, then builds your app step by step.</li>
+        </ol>
+      </details>
+      <h3>Preview</h3>
+      <pre id="preview"></pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

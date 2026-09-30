@@ -1,0 +1,25 @@
+# AGENTS.md — {{ title }}
+
+Instructions for AI coding agents (Codex, Cursor, Gemini CLI, Copilot, Aider, Claude Code…).
+Read this whole file and PROGRESS.md before doing anything.
+
+## Rules
+- **Owner's experience: {{ experience }}.** {{ explain_style }}
+- One milestone at a time, on its own branch. Small commits with clear messages. Never push to main: open a PR.
+- Definition of done for ANY change: tests added/updated → `{{ p.lint }}`, `{{ p.typecheck }}`, `{{ p.test }}`,
+  `{{ p.build }}` all pass → self-review the diff → PR with a plain-language description → PROGRESS.md updated.
+- **Bug-loop protocol:** if a fix doesn't work the first time, stop patching. Reproduce → write a failing test →
+  find the root cause → one focused fix. Never delete or weaken tests. After 2 failed hypotheses, revert to the last
+  green commit and explain the situation to the owner with 2 options.
+- Stay inside the tech stack below. Ask the owner before adding services, paid plans, or infrastructure.
+- Secrets only in `.env` (never committed, never printed). Add names to `.env.example`.
+- Git hooks (`.githooks/`) and CI (`.github/workflows/ci.yml`) are the safety net. Never use `--no-verify`,
+  never disable a CI check to make it pass.
+
+## Commands
+Install `{{ p.install }}` · Run `{{ p.dev }}` · Lint `{{ p.lint }}` · Typecheck `{{ p.typecheck }}` ·
+Test `{{ p.test }}` · Build `{{ p.build }}`
+
+---
+
+{{ plan_body }}

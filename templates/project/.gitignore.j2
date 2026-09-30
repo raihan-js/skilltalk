@@ -1,0 +1,47 @@
+# Secrets & local files — never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Claude Code local state
+.claude/.state/
+.claude/settings.local.json
+.claude/ALLOW_GUARDRAIL_EDITS
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+{% if p.id == "node" %}
+# Node
+node_modules/
+.next/
+dist/
+build/
+out/
+coverage/
+.vercel/
+.turbo/
+*.log
+.expo/
+{% elif p.id == "python" %}
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+{% elif p.id == "flutter" %}
+# Flutter
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+{% endif %}

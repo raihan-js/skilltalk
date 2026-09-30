@@ -1,0 +1,284 @@
+# SkillTalk question bank
+# Each slot = one thing a good build skill needs to know.
+# Fields:
+#   id           unique slot key (used in the spec JSON and the template)
+#   topic        short label for the progress bar
+#   ask          default wording (the LLM may rephrase it)
+#   why          one line, plain language: why this matters (shown as a tooltip)
+#   options      for choice questions: label + explain (bracket text, <= 15 words)
+#   default      what "Pick for me" / "I don't know" resolves to
+#   default_reason  one sentence the interviewer says when applying the default
+#   hotwords     words to bias speech-to-text for this answer
+#   ask_if       optional: {slot: X, not_in: [...]} or {slot: X, in: [...]} — skip otherwise
+#   required     if true, the interview can't finish without it (default applies if user skips)
+
+slots:
+  - id: idea
+    topic: Idea
+    required: true
+    ask: "Tell me about what you want to build — in your own words. What's it for?"
+    why: "Everything else depends on this. Messy is fine!"
+
+  - id: project_name
+    topic: Name
+    required: true
+    ask: "What should we call it? A working name is fine."
+    why: "Your skill and project folder get this name."
+    default: "my-app"
+    default_reason: "We can rename it any time."
+
+  - id: experience_level
+    topic: Your experience
+    ask: "How comfortable are you with code and tech? No wrong answer — it just changes how your AI helper explains things."
+    why: "Beginners get every step explained and small lessons along the way; developers get short, direct updates."
+    options:
+      - {label: "Beginner", explain: "never really coded; explain everything simply"}
+      - {label: "Some experience", explain: "tried a bit of coding or no-code tools"}
+      - {label: "Developer", explain: "I code; keep explanations short"}
+    default: "Beginner"
+    default_reason: "I'll have your AI helper explain everything in plain words — you can always ask it to be briefer."
+
+  - id: target_users
+    topic: Users
+    required: true
+    ask: "Who will use it? Just you, people you know, or the public?"
+    why: "Decides if we need logins, privacy protection and how strong the servers must be."
+    options:
+      - {label: "Just me", explain: "personal tool; simplest possible setup"}
+      - {label: "A small group", explain: "family, team or class; needs simple logins"}
+      - {label: "The public", explain: "anyone can sign up; needs security and scaling"}
+    default: "A small group"
+    default_reason: "It's the safest middle ground and easy to grow later."
+
+  - id: users_count
+    topic: Scale
+    ask: "Roughly how many people in the first few months? A guess is fine."
+    why: "Helps pick hosting that's free now and won't break later."
+    options:
+      - {label: "Under 100", explain: "free tiers are plenty"}
+      - {label: "100 to 10,000", explain: "still cheap; needs sensible setup"}
+      - {label: "More than 10,000", explain: "plan for performance and costs from day one"}
+    default: "Under 100"
+    default_reason: "Most apps start small; the stack we pick can grow."
+
+  - id: reliability
+    topic: Reliability
+    ask: "If the app stopped working for an hour, how bad would that be?"
+    why: "Decides how much safety net we build: backups, monitoring, alerts, and how we scale."
+    options:
+      - {label: "No big deal", explain: "a hobby or personal project"}
+      - {label: "Annoying", explain: "people rely on it, but nobody loses money"}
+      - {label: "Business-critical", explain: "downtime costs money or trust; needs alerts and backups"}
+    default: "Annoying"
+    default_reason: "We'll add sensible backups and error alerts without over-engineering."
+
+  - id: core_features
+    topic: Must-haves
+    required: true
+    ask: "What are the 3 to 5 things it absolutely must do on day one?"
+    why: "Your first version (the MVP, 'minimum viable product') — small and working beats big and broken."
+
+  - id: later_features
+    topic: Later
+    ask: "Anything you'd like later, but can wait?"
+    why: "We'll write these down so the AI doesn't build them too early."
+    default: "None yet"
+    default_reason: "We can add ideas any time."
+
+  - id: platform
+    topic: Platform
+    required: true
+    ask: "Where should people use it?"
+    why: "A website is by far the fastest to build and works on phones too."
+    hotwords: [website, web app, iPhone, Android, mobile, desktop, PWA]
+    options:
+      - {label: "Website", explain: "works in any browser, on phone and computer; fastest to build"}
+      - {label: "Phone app", explain: "installed from app stores; more work and review process"}
+      - {label: "Desktop app", explain: "installed on Windows/Mac/Linux; good for offline tools"}
+      - {label: "Pick for me", explain: "I'll choose the easiest option for your idea"}
+    default: "Website"
+    default_reason: "A website works everywhere and is the fastest thing an AI agent can build well."
+
+  - id: look_and_feel
+    topic: Look & feel
+    ask: "How should it look and feel? Any app you like the style of?"
+    why: "Gives the AI a design direction so it doesn't look generic."
+    default: "Clean, simple, friendly, works well on phones"
+    default_reason: "A clean simple look is easy to build and easy to change."
+
+  - id: frontend
+    topic: Frontend
+    ask: "For the part people see and click — the frontend — which should we use?"
+    why: "The toolkit the screens are built with."
+    hotwords: [Next.js, React, Vite, Vue, Svelte, SvelteKit, HTML, Tailwind, Expo, React Native, Flutter, Tauri]
+    ask_if: {slot: platform, not_in: ["Phone app", "Desktop app"]}
+    options:
+      - {label: "Next.js", explain: "most popular React toolkit; AI agents know it very well"}
+      - {label: "Vite + React", explain: "lighter and simpler; great for small apps without a server"}
+      - {label: "Plain HTML", explain: "no frameworks; best for a very simple page"}
+      - {label: "Pick for me", explain: "I'll choose based on your features"}
+    default: "Next.js"
+    default_reason: "Next.js does screens and server code in one place, and AI agents build it reliably."
+
+  - id: mobile_stack
+    topic: Mobile toolkit
+    ask: "For the phone app, which toolkit?"
+    why: "Decides if one codebase can cover iPhone and Android."
+    hotwords: [Expo, React Native, Flutter, Swift, Kotlin]
+    ask_if: {slot: platform, in: ["Phone app"]}
+    options:
+      - {label: "Expo (React Native)", explain: "one codebase for iPhone + Android; easiest to test"}
+      - {label: "Flutter", explain: "Google's toolkit; one codebase, very smooth visuals"}
+      - {label: "Pick for me", explain: "I'll choose the easiest"}
+    default: "Expo (React Native)"
+    default_reason: "Expo lets you test on your own phone instantly with one codebase."
+
+  - id: backend
+    topic: Backend
+    ask: "Does it need a 'backend' — a server that does work behind the scenes?"
+    why: "Needed for saving shared data, logins, payments or talking to AI securely."
+    hotwords: [backend, server, API, Node, Python, FastAPI, Express, serverless, Supabase, Firebase]
+    options:
+      - {label: "Use a ready-made backend", explain: "Supabase or Firebase give database + logins with little code"}
+      - {label: "Custom server", explain: "your own code (Node or Python); most flexible, more work"}
+      - {label: "No backend", explain: "everything stays on the device; simplest"}
+      - {label: "Pick for me", explain: "I'll decide from your features"}
+    default: "Use a ready-made backend"
+    default_reason: "It gives you a database and logins without writing server code."
+
+  - id: database
+    topic: Data
+    ask: "Where should your data live?"
+    why: "The database is where everything people create is saved."
+    hotwords: [Supabase, Postgres, PostgreSQL, Firebase, Firestore, SQLite, MongoDB, Neon]
+    ask_if: {slot: backend, not_in: ["No backend"]}
+    options:
+      - {label: "Supabase (Postgres)", explain: "online database with logins built in; free to start"}
+      - {label: "Firebase", explain: "Google's online database; great for real-time updates"}
+      - {label: "SQLite", explain: "one file on one computer; perfect for personal tools"}
+      - {label: "Pick for me", explain: "I'll choose the safest"}
+    default: "Supabase (Postgres)"
+    default_reason: "Supabase is free to start, includes logins, and uses a standard database you won't outgrow."
+
+  - id: auth
+    topic: Logins
+    ask: "How should people log in?"
+    why: "So each person only sees their own stuff."
+    hotwords: [Google login, magic link, email, password, OAuth, Clerk, Supabase Auth, Apple]
+    ask_if: {slot: target_users, not_in: ["Just me"]}
+    options:
+      - {label: "Google login", explain: "one click with their Google account"}
+      - {label: "Email magic link", explain: "we email a login link; no passwords to forget"}
+      - {label: "Email + password", explain: "the classic way"}
+      - {label: "Pick for me", explain: "I'll choose the smoothest"}
+    default: "Email magic link + Google login"
+    default_reason: "No passwords to manage, and most people have Google."
+
+  - id: uses_ai
+    topic: AI features
+    ask: "Will the app itself use AI — like chatting, summarising, or generating things?"
+    why: "AI features need an AI provider and cost a little per use."
+    options:
+      - {label: "Yes", explain: "the app will call an AI model"}
+      - {label: "No", explain: "no AI inside the app"}
+      - {label: "Maybe later", explain: "we'll leave room for it"}
+    default: "No"
+    default_reason: "We can add AI later; keeping version one simpler."
+
+  - id: ai_provider
+    topic: Which AI
+    ask: "Which AI should power it?"
+    why: "Hosted AIs are easiest; open models can run on your own machine for privacy."
+    hotwords: [Claude, Anthropic, OpenAI, GPT, Gemini, Llama, Qwen, Ollama, Mistral]
+    ask_if: {slot: uses_ai, in: ["Yes"]}
+    options:
+      - {label: "Hosted API (e.g. Claude)", explain: "best quality, pay per use, no servers to run"}
+      - {label: "Open model via Ollama", explain: "runs on your computer; free and private, needs a good PC"}
+      - {label: "Pick for me", explain: "I'll choose based on your budget"}
+    default: "Hosted API (e.g. Claude)"
+    default_reason: "Hosted APIs are the most reliable way to start; you only pay for what you use."
+
+  - id: monetization
+    topic: Money
+    ask: "Do you want it to make money? If so, how?"
+    why: "Payments change the design (plans, limits, checkout)."
+    hotwords: [Stripe, subscription, one-time, ads, free, freemium, Lemon Squeezy, Paddle]
+    ask_if: {slot: target_users, in: ["The public"]}
+    options:
+      - {label: "Free", explain: "no payments for now"}
+      - {label: "Subscription", explain: "monthly/yearly plans via Stripe"}
+      - {label: "One-time payment", explain: "pay once to unlock"}
+      - {label: "Freemium", explain: "free basic plan + paid extras"}
+    default: "Free"
+    default_reason: "Get people using it first; payments can be added later."
+
+  - id: revenue_goal
+    topic: Revenue goal
+    ask: "Any money goal? For example, how much per month by when?"
+    why: "Helps the AI prioritise features that bring revenue."
+    ask_if: {slot: monetization, not_in: ["Free"]}
+    default: "Not set yet"
+    default_reason: "We'll focus on a great first version."
+
+  - id: hosting
+    topic: Hosting
+    ask: "Where should it live online?"
+    why: "Hosting puts your app on the internet."
+    hotwords: [Vercel, Netlify, Render, Railway, Fly.io, AWS, Google Cloud, Azure, Cloudflare, Docker]
+    ask_if: {slot: platform, in: ["Website"]}
+    options:
+      - {label: "Vercel", explain: "one-click hosting for websites; free for small projects"}
+      - {label: "Railway / Render", explain: "easy hosting for custom servers; small monthly cost"}
+      - {label: "AWS / Google Cloud / Azure", explain: "big-company cloud; powerful but complex"}
+      - {label: "Pick for me", explain: "I'll choose the cheapest easy option"}
+    default: "Vercel"
+    default_reason: "Vercel is free to start and deploying is one click."
+
+  - id: coding_agent
+    topic: AI builder
+    ask: "Which AI coding assistant will build it for you?"
+    why: "Your skill comes with automatic safety checks (hooks), helper agents and settings made for that tool."
+    hotwords: [Claude Code, Cursor, Codex, Gemini CLI, Windsurf, Copilot, Cline, Aider]
+    options:
+      - {label: "Claude Code", explain: "gets the full setup: hooks, helper agents, commands"}
+      - {label: "Cursor", explain: "gets rules file, git safety checks and CI"}
+      - {label: "Codex / other", explain: "gets AGENTS.md, git safety checks and CI"}
+      - {label: "Pick for me", explain: "I'll set up the tool with the strongest safety net"}
+    default: "Claude Code"
+    default_reason: "It supports automatic safety hooks and helper agents, which prevent most AI-made bugs."
+
+  - id: budget
+    topic: Budget
+    ask: "What monthly budget is OK for servers and services, at the start?"
+    why: "We'll keep the AI from picking paid services you didn't agree to."
+    options:
+      - {label: "$0", explain: "free tiers only"}
+      - {label: "Under $25", explain: "a few small paid services"}
+      - {label: "Under $100", explain: "comfortable for a growing app"}
+    default: "$0"
+    default_reason: "Everything we chose has a free tier."
+
+  - id: timeline
+    topic: Timeline
+    ask: "When would you like a first working version?"
+    why: "Helps size the first milestone."
+    default: "About 2 weeks"
+    default_reason: "Two weeks is realistic for a focused first version with an AI agent."
+
+  - id: sensitive_data
+    topic: Privacy
+    ask: "Will it store anything sensitive — health, money, kids' data, private documents?"
+    why: "Sensitive data needs extra protection and sometimes legal rules."
+    options:
+      - {label: "No", explain: "normal everyday data"}
+      - {label: "Yes", explain: "we'll add stricter security rules"}
+      - {label: "Not sure", explain: "I'll treat it carefully to be safe"}
+    default: "Not sure"
+    default_reason: "Being careful costs little and protects your users."
+
+  - id: extras
+    topic: Anything else
+    ask: "Anything else the AI builder should know? Things you love or hate in apps?"
+    why: "Last chance to add your personal touch."
+    default: "Nothing else"
+    default_reason: "All good."

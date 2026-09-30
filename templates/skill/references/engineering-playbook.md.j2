@@ -1,0 +1,40 @@
+# Engineering playbook — {{ title }}
+
+How real software gets built, shipped and grown — in plain words, **tailored to this project**.
+
+**Your scale tier: {{ tier.label }}.** {{ tier.why }}
+
+Legend: 🟢 **NOW** = do it from the start · 🟡 **LATER** = when the trigger in the note happens ·
+⚪ **NOT NEEDED** = don't build it for this project (adding it would be over-engineering)
+
+## At a glance
+
+| Topic | For this project | Note |
+|---|---|---|
+{% for t in topics %}| {{ t.title }} | {{ t.badge }} | {{ t.note }} |
+{% endfor %}
+
+---
+{% for t in topics %}
+## {{ t.title }} — {{ t.badge }}
+
+*{{ t.analogy }}*
+
+{{ t.plain }}
+
+**For {{ title }}:** {{ t.note }}
+{% endfor %}
+
+---
+
+## The golden rule of scaling
+
+Scale in this order, and only when you *measure* a problem (slow pages, errors, costs):
+1. Fix the code (a missing database index fixes most "slowness").
+2. Vertical: upgrade the plan (bigger database / server).
+3. Cache what's read often.
+4. Horizontal: more server copies (automatic on serverless hosts — keep code stateless).
+5. Split out background jobs.
+6. Only then: containers → orchestration (Kubernetes) → multiple services.
+
+Every step up adds cost and complexity. Most successful products stay at steps 1–4 for years.

@@ -1,0 +1,29 @@
+#!/bin/sh
+# pre-commit: runs for EVERY commit, whichever AI tool (or human) makes it.
+# 1) block secret files and secret-looking values  2) run the linter if the project has one.
+# Installed by: git config core.hooksPath .githooks
+
+fail() { printf '\n🛑 Commit blocked: %s\n\n' "$1" >&2; exit 1; }
+
+# 1. Secret files
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+for f in $staged; do
+  case "$(basename "$f")" in
+    .env.example) ;;
+    .env|.env.*|*.pem|*.key|id_rsa|id_ed25519|*.p12) fail "'$f' looks like a secrets file. Remove it: git restore --staged '$f' (and make sure it's in .gitignore)." ;;
+  esac
+done
+
+# 2. Secret-looking values in the staged changes
+if git diff --cached -U0 | grep -E '^\+' | grep -qE 'AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{40,}|(sk|rk)_live_[A-Za-z0-9]{16,}|sk-(proj-|ant-)?[A-Za-z0-9_-]{32,}|xox[abprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}'; then
+  fail "the change contains what looks like a real API key or private key. Put it in .env and read it from an environment variable."
+fi
+
+# 3. Lint (only if the project defines it)
+if [ -f package.json ] && grep -q '"lint"' package.json; then
+  npm run lint --silent >/dev/null 2>&1 || fail "lint failed. Run 'npm run lint' to see the problems and fix them."
+elif [ -f pyproject.toml ] && command -v ruff >/dev/null 2>&1; then
+  ruff check -q . || fail "ruff found problems. Run 'ruff check .' and fix them."
+fi
+
+exit 0

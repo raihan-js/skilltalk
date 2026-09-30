@@ -1,0 +1,48 @@
+# Guardrails — Family Todo App
+
+Rules for the AI agent. They exist because they prevent the most common ways AI-built projects break.
+The hooks, git hooks and CI enforce many of them automatically; the rest are the agent's responsibility.
+
+## Always
+
+1. **Small steps.** One milestone / feature / bug at a time, on its own branch. Diffs small enough to review.
+2. **Tests define done.** New behaviour → new test. Bug fix → a test that fails before the fix.
+3. **Run everything before saying done:** `npm run lint` · `npm run typecheck` · `npm test` · `npm run build`.
+4. **Plain language** for the owner (Beginner): what you did, why, how to test it.
+5. **Stay in the stack** chosen in the skill. New library/service/infrastructure → `architect` agent → owner's OK.
+6. **Stateless, simple code:** no files saved on the server's disk, no state kept in server memory, no clever abstractions.
+7. **Update PROGRESS.md** at the end of every milestone and whenever a decision is made.
+
+## Never
+
+- Push to main, force-push, or use `--no-verify`.
+- Delete, skip or weaken tests to make them pass; disable CI checks, hooks or linters.
+- Write secrets into code, print `.env`, or put secret values in anything the browser receives.
+- Run destructive commands (recursive deletes, database resets/drops) without the owner's explicit OK.
+- Add paid services, change pricing plans, or deploy to production manually without asking.
+- Add infrastructure the engineering playbook marks ⚪ NOT NEEDED (e.g. Kubernetes for this project).
+- Claim success without evidence (command output, passing tests, a working preview).
+
+## Bug-loop protocol (use `/fix` or the `debugger` agent)
+
+A bug that survives one fix attempt means the cause isn't understood. From that moment:
+
+1. **Stop editing.** 2. **Reproduce** with one exact command or click-path. 3. **Capture** the full error.
+4. **Failing test** that shows the bug. 5. **Root cause** — numbered hypotheses, verify each with evidence.
+6. **One focused fix**, then all checks. 7. After **2 failed hypotheses**: revert to the last green commit,
+   explain to the owner in plain words, offer 2 options.
+
+The loop-detection hook fires automatically when one file is changed 6+ times in a session.
+
+## Definition of done (every change)
+
+- [ ] Does what was asked — and nothing extra
+- [ ] Tests added/updated; lint, typecheck, tests, build green locally
+- [ ] `code-reviewer` agent: no "must fix" left (plus `security-auditor` if auth/data/payments/AI changed)
+- [ ] PR open with a plain-language description and test steps; CI green
+- [ ] PROGRESS.md updated
+
+## Changing the guardrails themselves
+
+The hooks and settings are protected from the agent. If one is genuinely wrong, the agent explains why to the
+owner; the owner creates `.claude/ALLOW_GUARDRAIL_EDITS`, the change is made in its own PR, and the file is deleted.

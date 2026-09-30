@@ -1,0 +1,18 @@
+#!/bin/sh
+# pre-push: changes reach main only through a pull request (so CI checks them first).
+# The very first push that CREATES main in a new repo is allowed.
+# Emergency override (owner only): ALLOW_MAIN_PUSH=1 git push ...
+
+zero="0000000000000000000000000000000000000000"
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/master)
+      if [ "$remote_sha" != "$zero" ] && [ "$ALLOW_MAIN_PUSH" != "1" ]; then
+        printf '\n🛑 Push blocked: never push straight to main.\n' >&2
+        printf '   Push a branch and open a pull request instead:\n' >&2
+        printf '   git switch -c my-change && git push -u origin my-change && gh pr create --fill\n\n' >&2
+        exit 1
+      fi ;;
+  esac
+done
+exit 0

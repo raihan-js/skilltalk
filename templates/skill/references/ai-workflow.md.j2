@@ -1,0 +1,90 @@
+# Working with AI to build {{ title }}
+
+For the owner **and** the AI agent. Owner's experience: **{{ experience }}**. AI builder: **{{ agent }}**.
+
+## Why AI-built projects fall apart (and what protects this one)
+
+| What goes wrong | What it looks like | What's set up to prevent it |
+|---|---|---|
+| Giant requests | "Build the whole app" → thousands of lines nobody understands | Build plan split into small milestones; `/plan` for features |
+| No tests | Every fix breaks something else | `test-writer` agent; quality gate runs tests before "done"; CI on every PR |
+| Fix loops | Same file patched 10 times, bugs multiply | Loop detector hook; `/fix` protocol; `debugger` agent; revert to last green |
+| Forgetting context | New session, agent redoes or undoes old work | PROGRESS.md loaded at every session start |
+| Scope creep | Features and libraries nobody asked for | Stack fixed in the skill; `architect` agent pushes back; ask-first rule |
+| Over-engineering | Kubernetes & microservices for 20 users | Engineering playbook marks what's NOT NEEDED for your scale |
+| Leaked secrets | API key pushed to GitHub, then abused | File guard hook, git pre-commit scan, CI secret scan |
+| Destroyed work | `rm -rf`, force-push, database wipe | Bash guard hook blocks destructive commands |
+| "It's done!" (it isn't) | Claims success without running anything | Stop-hook quality gate; definition of done; PR checks |
+| Direct edits to live app | Broken production | Branches + PRs + CI + previews; pre-push hook blocks pushing to main |
+
+## The golden loop (every piece of work)
+
+1. **Plan** — say what you want in normal words; the agent turns it into small steps (`/plan`).
+2. **Build one step** — on a branch.
+3. **Test** — automated tests + you try it (preview link or locally).
+4. **Review** — `code-reviewer` agent; `security-auditor` for logins, data, payments, AI.
+5. **Commit & PR** — CI must be green.
+6. **Merge & check** — production deploys automatically; 1-minute check that it works.
+7. **Update PROGRESS.md** — so the next session knows where we are.
+
+## What was set up for you (plain words)
+{% if agent_is_claude %}
+| Piece | What it does |
+|---|---|
+| **Session-start hook** | Reminds the AI of the plan, progress and branch every time you open a session. |
+| **Bash guard hook** | Blocks dangerous commands (deleting everything, force-push, pushing to main, wiping databases, printing secrets). |
+| **File guard hook** | Blocks writing secrets into code, editing `.env`, hand-editing lockfiles, or weakening the safety net. |
+| **Post-edit hook** | Auto-formats every file the AI changes; warns it when it's stuck in a fix loop. |
+| **Quality gate (stop hook)** | Before the AI says "done", runs lint/typecheck/tests; sends it back once to fix failures. |
+| **Helper agents** | `architect` (plans), `test-writer`, `code-reviewer`, `debugger`, `security-auditor`. |
+| **Commands** | `/plan`, `/fix`, `/ship`, `/explain`, `/status`. |
+{% else %}
+Your AI builder ({{ agent }}) doesn't support Claude Code hooks, so the safety net lives in git and GitHub:
+{% if agent == "Cursor" %}a rules file (`.cursor/rules/project.mdc`) that points Cursor to AGENTS.md, {% endif %}
+AGENTS.md rules, git hooks (secret scan + lint before every commit, no pushing to main) and CI on every PR.
+{% endif %}
+| Also set up | What it does |
+|---|---|
+| **Git hooks** (`.githooks/`) | Work with ANY tool: block secrets in commits, run lint, block pushing straight to main. |
+| **CI** (`.github/workflows/ci.yml`) | Checks every pull request automatically. |
+| **Dependabot** | Opens PRs to keep libraries updated and patched. |
+| **PR template** | Every change explained in plain words, with a test plan. |
+
+## Prompts that work (copy & say them)
+
+- **Start of a session:** "Read PROGRESS.md and continue with the next step of the current milestone. Explain the plan first."
+- **New feature:** "/plan Add a way for family members to comment on a task." *(or just describe it)*
+- **Something's broken:** "/fix When I tick a task on my phone it comes back after refresh." — say *what you did, what you expected, what happened*.
+- **Understand something:** "/explain what a database migration is" · "/explain why we don't need Kubernetes"
+- **Where are we?** "/status"
+- **Ready to publish:** "/ship"
+- **When it goes in circles:** "Stop. Go back to the last working version and explain in plain words what's going wrong, with 2 options."
+
+## Session hygiene (keeps quality high)
+
+- **One milestone or feature per session.** Start fresh for unrelated work (in Claude Code: `/clear`).
+- Long sessions make any AI sloppier. If it starts forgetting things, ask it to update PROGRESS.md, then start a new session.
+- Use **plan mode** (or ask "plan first, don't code yet") for anything touching more than a couple of files.
+- Use the strongest model / highest effort for planning and debugging; a faster one is fine for small, clear edits.
+
+## Reviewing when you're not technical — 5 questions to ask the AI
+
+1. "What exactly changed, in 3 sentences?"
+2. "Which tests prove it works, and did they all pass?"
+3. "What could break because of this, and how do we undo it?"
+4. "Did you add any new library, service or cost?"
+5. "Is anything secret or personal stored or sent anywhere new?"
+
+## Red flags — stop and ask
+
+- It says "this should work" without having run anything.
+- It deletes, skips or loosens tests.
+- One change touches dozens of files, or adds several new libraries.
+- It wants to disable a check, a hook or CI "temporarily".
+- It says "done" while CI is red.
+- It suggests Kubernetes, microservices or a second database for a small app.
+
+## Money
+
+AI coding sessions, hosting and AI features all cost money by usage. Budget: **{{ budget }}/month** for services.
+The AI must ask before adding anything paid and report costs in `/status`.

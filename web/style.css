@@ -1,0 +1,41 @@
+:root {
+  --bg: #f7f6f2; --card: #ffffff; --ink: #1d1d1f; --muted: #6b6b70; --accent: #3b5bdb;
+  --accent-ink: #fff; --line: #e4e2dc; --chip: #eef1fc; --danger: #d6336c;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #151517; --card: #1f1f23; --ink: #f1f1f3; --muted: #a0a0a8; --accent: #7c93ff;
+          --accent-ink: #0d0d10; --line: #2e2e34; --chip: #262b40; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+       font: 17px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header, main { max-width: 760px; margin: 0 auto; padding: 16px; }
+h1 { margin: 16px 0 4px; font-size: 28px; }
+.tag { color: var(--muted); margin: 0 0 8px; }
+.toggle { font-size: 14px; color: var(--muted); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+.center { text-align: center; }
+.hidden { display: none; }
+.progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 14px; }
+#bar { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.topic { text-transform: uppercase; letter-spacing: .06em; font-size: 12px; color: var(--muted); margin: 0; }
+.question { font-size: 21px; font-weight: 600; margin: 6px 0; }
+.why { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+.options { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip { background: var(--chip); border: 1px solid transparent; color: var(--ink); border-radius: 12px;
+        padding: 8px 12px; text-align: left; cursor: pointer; font: inherit; font-size: 15px; max-width: 100%; }
+.chip:hover, .chip:focus-visible { border-color: var(--accent); outline: none; }
+.chip small { display: block; color: var(--muted); font-size: 13px; }
+textarea { width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 10px; font: inherit;
+           background: transparent; color: var(--ink); resize: vertical; }
+.row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+button, .button { border: 0; border-radius: 12px; padding: 12px 18px; font: inherit; cursor: pointer;
+                  text-decoration: none; display: inline-block; }
+.primary { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.big { font-size: 20px; padding: 14px 36px; }
+.mic { flex: 1; background: var(--chip); color: var(--ink); font-weight: 600; user-select: none; touch-action: none; }
+.mic.recording { background: var(--danger); color: #fff; }
+.status { color: var(--muted); font-size: 14px; min-height: 1.5em; margin: 8px 0 0; }
+pre { white-space: pre-wrap; background: var(--bg); border-radius: 12px; padding: 14px; font-size: 13px;
+      max-height: 480px; overflow: auto; }
+code { background: var(--chip); padding: 1px 5px; border-radius: 6px; font-size: 14px; }
